@@ -1,0 +1,18 @@
+{
+  "name": "cap-application",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sap/cds": "^9"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "dev": "cds watch",
+    "build": "mbt build -t gen --mtar mta.tar",
+    "deploy": "cf deploy gen/mta.tar",
+    "undeploy": "cf undeploy cap-application --delete-services --delete-service-keys"
+  },
+  "private": true
+}
