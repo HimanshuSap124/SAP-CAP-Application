@@ -1,7 +1,12 @@
+### GET call to Read all the Warehouses
 GET http://localhost:4004/odata/v4/warehouse/Warehouses
 
-###
 
+### GET call to Read a specific Warehouse by ID
+GET http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440004)
+
+
+### POST call to Create a new Warehouse
 POST http://localhost:4004/odata/v4/warehouse/Warehouses
 Content-Type: application/json
 
@@ -13,7 +18,7 @@ Content-Type: application/json
 }
 
 
-###
+### PUT call to Update the Warehouse details
 PUT http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440010)
 Content-Type: application/json
 
@@ -24,8 +29,7 @@ Content-Type: application/json
 }
 
 
-###
-
+### PATCH call to Update the Warehouse address
 PATCH http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440010)
 Content-Type: application/json
 
@@ -35,5 +39,5 @@ Content-Type: application/json
 
 
 
-###
+### DELETE call to Remove the Warehouse
 DELETE http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440010)
