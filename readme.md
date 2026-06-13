@@ -25,99 +25,273 @@ File or Folder | Purpose
 Learn more at https://cap.cloud.sap/docs/get-started/.
 
 
-# Handlers in SAP CAP
+# Path Variables
 
-- In SAP CAP (Cloud Application Programming Model), handlers are used to add custom logic to service operations (like CRUD or custom actions/functions). 
-- They are typically implemented in JavaScript (Node.js) or Java and are registered on service events.
+A Path Variable is a dynamic value embedded directly within the URL path that is used to identify, locate, or operate on a specific resource in an application.
 
-In SAP CAP, different methods are represented as - 
-- GET → READ
-- POST → CREATE
-- PATCH → UPDATE
-- DELETE → DELETE
+It allows the same API endpoint to work with different resources by passing unique values in the URL itself.
 
-- These are Default handlers which are built-in service provided automatically by the SAP CAP runtime that process standard CRUD operations (CREATE, READ, UPDATE, DELETE) for the entities without requiring custom implementation.
+In SAP CAP, a path variable is a value passed in the URL path that uniquely identifies a specific resource (entity instance). In OData services, path variables are typically represented by the entity key inside parentheses.
 
-## Main Types of Handlers in SAP CAP
+Path Variable must have Primary Key field atleast.
 
-### 1. Before Handlers (before)
+CAP provides inbuild path variable feature which you can consume directly.
 
-- It gets executed before the actual operation is performed.
-
-- It is used for - Input validation, Data modification or Authorization checks, etc.
-
-- It can modify request data (req.data) or 
-can reject request using req.error()
-
-
-### 2. On Handlers (on)
-
-- It Replace or fully handle the core processing logic.
-- It is used when You want to override default CAP behavior or Implement custom business logic.
-
-### 3. After Handlers (after)
-
-- It gets executed after the operation has finished.
-- It is used for - Enriching response data, Logging or Post-processing etc.
-
-- It cannot reject the request, instead it works on response data and useful for formatting the response data.
-
-
-## Additional Handler Variants
-
-### 4. Event-Specific Handlers
-
-- It work with - Standard events: CREATE, READ, UPDATE, DELETE and Custom events: myAction, myFunction
+For Example - 
 
 ```
-this.on('myAction', (req) => {
-  return { result: 'Success' };
-});
+GET http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440009)
+Content-Type: application/json
+```
+
+OR 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses(ID=550e8400-e29b-41d4-a716-446655440008)
+Content-Type: application/json
+```
+
+And we can customize the custom logic based on request.params.
+
+
+## next in cap
+`next` is a function available in CAP on event handlers that passes control to the next handler in the processing chain or to CAP's built-in Generic Provider.
+
+So, since we know CAP automatically provides CRUD operations through its Generic Provider without any custom logic.
+
+When you implement any custom logic then we are affecting CAP's normal flow.
+
+At that point CAP doesn't know whether you want to completely replace the READ operation OR you only want to add validation and continue.
+
+next() resolves this ambiguity.
+
+So without next(), Your handler becomes responsible for everything.
+
+```
+Request
+   ↓
+Custom Handler
+   ↓
+STOP
+```
+
+and with next(), your handler act as a validation check.
+
+```
+Request
+   ↓
+Custom Handler
+   ↓
+next()
+   ↓
+CAP Generic Provider
+   ↓
+Database
+   ↓
+Response
+```
+
+Remember, if you are using next and also performing some CRUD operation on DB through custom logic, then you are already reading the database once and then next() causes CAP to read it again.
+
+So there will be two database calls.
+
+### When Should You Use next()?
+
+Use it when you want to:
+
+- Validate input and still use standard CRUD.
+- Check authorization.
+- Log requests.
+- Enrich responses.
+- Add business rules before or after CAP processing.
+
+### When Should You Avoid next()?
+
+Avoid it when:
+
+- You want complete control over the response.
+- You are replacing CAP's default CRUD behavior.
+- You are reading from an external API instead of the database.
+- You are building a completely custom query.
+
+
+
+## Query Parameter
+
+A Query Parameter is a key-value pair appended to the URL after a `?` symbol and is used to filter, search, sort, paginate, or modify the behavior of an API request without changing the resource path.
+
+Path parameters identify a resource, while query parameters refine or filter the result.
+
+Different Query Params provided by CAP are - 
+1. $select
+2. $search
+3. $filter
+4. $orderby
+5. $top
+6. $skip 
+7. $count
+
+
+### 1. $select
+
+If we want to display only specific fields in the response, we can use the $select query option.
+
+Example -
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$select=ID,name
+Content-Type: application/json
 ```
 
 
-### 5. Wildcard Handlers
+### 2. $search
 
-- It is used to attach handler to multiple entities/events.
+If we want to search for a specific value in the response data, we can use the $search query option.
 
+Example -
 ```
-this.before('*', (req) => {
-  console.log('Triggered for all events');
-});
-```
-
-### 6. Entity-Specific vs Global Handlers
-
-Entity-specific:
-```
-this.before('CREATE', 'Books', ...)
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$search=Warehouse
+Content-Type: application/json
 ```
 
-Global (service-level):
+
+### 3. $filter
+
+The $filter query option is used to retrieve data that matches a specified condition.
+
+Example -
 ```
-this.before('CREATE', ...)
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$filter=name eq 'Elite Storage'
+Content-Type: application/json
 ```
 
-@odata.draft.enabled
-@requires: 'Admin'
-
-Validation Handler - 
 ```
-entity Books {
-  title : String @mandatory;
-  price : Decimal @assert.range: [0, 1000];
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$filter=ID gt 550e8400-e29b-41d4-a716-446655440004
+Content-Type: application/json
+```
+
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$filter=ID gt 550e8400-e29b-41d4-a716-446655440004 and name eq 'Elite Storage'
+Content-Type: application/json
+```
+
+### 4. $orderby
+
+The $orderby query option is used to sort the response data in ascending or descending order based on a specified field.
+
+Example -
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$orderby=name desc
+Content-Type: application/json
+```
+
+
+### 5. $top
+
+The $top query option is used to limit the number of records and return specific number of response data.
+
+Example-
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=5
+Content-Type: application/json
+```
+
+### 6. $skip
+
+Use the $skip query option to ignore the first N records in the response. It is typically combined with $top to implement paging.
+
+Example- 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=5&$skip=2
+Content-Type: application/json
+```
+
+### 7. $count
+
+The $count query parameter allows us to obtain the total count of records that match the query criteria.
+
+Example- 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=5&$skip=2&$count=true
+Content-Type: application/json
+```
+
+
+
+## Paging
+
+Paging in SAP CAP is the process of retrieving data in smaller chunks instead of fetching the entire dataset at once. 
+
+CAP supports paging through the OData query options $top and $skip.
+
+
+### 1. Client-Side Paging
+
+Client-side paging can be implemented by using the $top and $skip OData query options to retrieve a specific subset of records from the complete dataset.
+
+Example- 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=5&$skip=2
+Content-Type: application/json
+```
+
+
+### 2. Server-Side Paging (Default Page Size)
+
+We can configure a default and maximum page size in our service definition in service.cds file.
+
+We can use @cds.query.limit.default and @cds.query.limit.max annotation on the service file.
+
+like - 
+```
+service WarehouseService @(path : 'warehouse') {
+    
+    @cds.query.limit.default: 5
+    @cds.query.limit.max: 8
+    entity Warehouses as projection on schema.Warehouse;
+
+    function getWarehouseCount() returns Integer ;
+
+    action updateWarehouseOwner(warehouseId : String, newOwner : String) returns String ;
 }
 ```
 
+and then request data will return default of 5 records using - 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses
+Content-Type: application/json
+```
 
-### Function
+and will return max of 8 records if we try to fetch more than 8 records -
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=12
+Content-Type: application/json
+```
 
-- A function in SAP CAP is a read-only operation defined in CDS that retrieves or computes data without causing any side effects or modifying the database.
 
-- Function is used to fetch or calculate data without changing anything.
+### 3. Global Paging Configuration
 
-### Action
+You can define limits for all services of the application and can define define it in package.json.
 
-- An action in SAP CAP is an operation defined in CDS that performs business logic and can modify data or cause side effects in the system.
+like - 
 
-- Action is used to execute operations that change data or trigger business processes.
+```
+"cds": {
+   "query": {
+      "limit": {
+         "default": 5,
+         "max": 8
+      }
+   }
+}
+```
+
+and then request data will return default of 5 records using - 
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses
+Content-Type: application/json
+```
+
+and will return max of 8 records if we try to fetch more than 8 records -
+```
+GET http://localhost:4004/odata/v4/warehouse/Warehouses?$top=12
+Content-Type: application/json
+```

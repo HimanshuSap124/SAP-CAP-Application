@@ -10,6 +10,24 @@ const { Warehouse } = cds.entities('cap.application.db.schema');    //  -> Absol
 
 const WarehouseService = async (srv) => {
 
+
+    //  ######################### READ - Handler ##########################
+    //  Custom Logic for Different multiple Path Variables
+    srv.on('READ', 'Warehouses', async (request, next) => {
+        try {
+            // console.log(JSON.stringify(request.query, null, 2));
+
+            return next();
+
+        }
+        catch (error) {
+            return request.error({
+                code: 500,
+                message: `Internal Server Error`
+            });
+        }
+    });
+
     //  ######################### CREATE - Handler ##########################
     
     srv.before('CREATE', 'Warehouses', async (request) => {

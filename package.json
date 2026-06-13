@@ -19,6 +19,12 @@
   },
   "private": true,
   "cds": {
+    "query": {
+      "limit": {
+        "default": 5,
+        "max": 8
+      }
+    },
     "requires": {
       "[production]": {
         "auth": "xsuaa",
