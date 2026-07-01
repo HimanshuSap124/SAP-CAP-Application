@@ -10,24 +10,6 @@ const { Warehouse } = cds.entities('cap.application.db.schema');    //  -> Absol
 
 const WarehouseService = async (srv) => {
 
-
-    //  ######################### READ - Handler ##########################
-    //  Custom Logic for Different multiple Path Variables
-    srv.on('READ', 'Warehouses', async (request, next) => {
-        try {
-            // console.log(JSON.stringify(request.query, null, 2));
-
-            return next();
-
-        }
-        catch (error) {
-            return request.error({
-                code: 500,
-                message: `Internal Server Error`
-            });
-        }
-    });
-
     //  ######################### CREATE - Handler ##########################
     
     srv.before('CREATE', 'Warehouses', async (request) => {
@@ -55,12 +37,16 @@ const WarehouseService = async (srv) => {
 
     srv.on('CREATE', 'Warehouses', async (request) => {
         try {
-            const { name, owner, address } = request.data;
+            const { name, owner, address, region_ID } = request.data;
 
+            //  Lets make it valid from today and valid to 1 year from now
             const newEntryPayload = {
                 name: name,
                 owner: owner,
-                address: address
+                address: address,
+                region_ID: region_ID,
+                validFrom : new Date().toISOString(),
+                validTo : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
             }
 
             const newEntry = await cds.tx(async (tx) => {
@@ -90,69 +76,10 @@ const WarehouseService = async (srv) => {
         //  Just for fun, we wants to log the message in console after creating the entry in database.
         console.log(data);
 
-        console.log(request.data);
+        console.log("Successfully created the Record");
 
         return data ;
     });
-
-
-
-    //  ######################### Function ##########################
-    srv.on('getWarehouseCount', async (request) => {
-        try {
-            const warehouseRecords = await cds.tx(async (tx) => {
-                return await tx.run(SELECT.from(Warehouse));
-            });
-
-            if (!warehouseRecords) {
-                throw new Error(`No Records Found`);
-            }
-
-            return warehouseRecords.length;
-        }
-        catch (error) {
-            return request.error({
-                code: 500,
-                message: `Internal Server Error`
-            });
-        }
-    });
-
-
-
-    //  ######################### Actions ##########################
-    srv.on('updateWarehouseOwner', async (request) => {
-        try {
-
-            const {warehouseId , newOwner} = await request.data ;
-
-            if(!warehouseId || !newOwner){
-                throw new Error(`Invalid Request, please check payload`);
-            }
-
-
-            const updateRecord = await cds.tx(async (tx) => {
-                return await tx.run(UPDATE(Warehouse).set({owner : newOwner}).where({ID : warehouseId}));
-            });
-
-            if(!updateRecord){
-                throw new Error(`Failed to Update Warehouse Owner`);
-            }
-
-            return "Owner details updated Successfully"
-
-        }
-        catch (error) {
-            return request.error({
-                code: 500,
-                message: `Internal Server Error`
-            });
-        }
-    });
-
-
-    
-
 
 
 }

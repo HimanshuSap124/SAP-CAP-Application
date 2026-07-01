@@ -20,6 +20,11 @@ File or Folder | Purpose
 - Start adding content, for example, a [db/schema.cds](db/schema.cds).
 
 
+# Aspect
+An aspect is a reusable collection of fields, annotations, or relationships that can be shared across multiple entities to avoid writing the same code repeatedly.
+
+We use aspects to reuse common fields, annotations, or relationships across multiple entities, reducing code duplication and making the data model easier to maintain.
+
 ## 1. uuid
 - UUID (Universally Unique Identifier) is a data type in SAP CAP that stores a globally unique 128-bit identifier. 
 - It is used when you want every record to have a unique ID that is extremely unlikely to duplicate, even across different systems.
@@ -37,7 +42,7 @@ entity Warehouse {
 
 ## 2. cuid
 - cuid is a built-in aspect provided by SAP CAP that automatically adds a primary key named ID of type UUID to an entity. 
-- It saves you from manually declaring the UUID key.
+- It saves you from manually declaring the UUID key, so if we use cuid then entity will itself make a field of ID as UUID and its value will automatically gets added when we add new entry on the entity.
 
 We can use CUID aspect in entity like - 
 ```
