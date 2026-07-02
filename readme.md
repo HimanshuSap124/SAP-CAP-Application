@@ -70,7 +70,8 @@ So we don't need to add or manage the ID manually.
 - managed is a built-in aspect that automatically adds and maintains audit fields such as who created or modified a record and when those actions occurred.
 
 We can use this aspect in entity like -
-```using { cuid, managed } from '@sap/cds/common';
+```
+using { cuid, managed } from '@sap/cds/common';
 entity Warehouse : cuid, managed{
    name : String;
    owner : String;
@@ -131,7 +132,7 @@ using { cuid, managed } from '@sap/cds/common';
 entity Warehouse : cuid, managed{
     name : String;
     owner : String;
-    address : localized String ;
+    address : String ;
 }
 ```
 
@@ -146,8 +147,8 @@ Aspect CodeList actually is -
 ```
 aspect CodeList {
     key code : String;
-    name      : localized String;
-    descr     : localized String;
+    name      : String;
+    descr     : String;
 }
 ```
 
@@ -160,14 +161,14 @@ entity Regions : CodeList {};
 entity Warehouse : cuid {
     name       : String;
     owner      : String;
-    address    : localized String;
+    address    : String;
 
     region : Association to Regions;
 }
 ```
 
 ## 7. Custom Aspect
-- A custom aspect is a reusable collection of fields, associations, or annotations created by the developer. 
+- A custom aspect is a reusable collection of fields, associations, or annotations created by the developer.
 - It allows the same structure to be shared across multiple entities.
 
 We can create an aspect like - 
@@ -189,7 +190,7 @@ aspect SoftDelete {
 entity Warehouse : cuid, SoftDelete {
     name       : String;
     owner      : String;
-    address    : localized String;
+    address    : String;
 }
 ```
 
@@ -199,7 +200,7 @@ and our entity will actually looks like -
 entity Warehouse : cuid, SoftDelete {
     name       : String;
     owner      : String;
-    address    : localized String;
+    address    : String;
     isDeleted  : Boolean default false;
 }
 ```
