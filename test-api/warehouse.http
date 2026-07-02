@@ -1,5 +1,10 @@
 ### GET call to Read all the Warehouses
+GET http://localhost:4004/odata/v4/warehouse/AllEntities
+Accept-Language: en
+
+### GET call to Read all the Warehouses
 GET http://localhost:4004/odata/v4/warehouse/Warehouses
+
 
 ### POST call to Create a new Warehouse
 POST http://localhost:4004/odata/v4/warehouse/Warehouses

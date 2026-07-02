@@ -10,8 +10,16 @@ const { Warehouse } = cds.entities('cap.application.db.schema');    //  -> Absol
 
 const WarehouseService = async (srv) => {
 
+
+    //  ######################### Handler to get all the Entity details ##########################
+    srv.on('AllEntities', async (request) => {
+        console.log(Object.keys(cds.entities('cap.application.db.schema')));
+    });
+
+
+
+
     //  ######################### CREATE - Handler ##########################
-    
     srv.before('CREATE', 'Warehouses', async (request) => {
         try {
             const { name, owner, address } = request.data;
@@ -45,11 +53,11 @@ const WarehouseService = async (srv) => {
                 owner: owner,
                 address: address,
                 region_ID: region_ID,
-                validFrom : new Date().toISOString(),
-                validTo : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+                validFrom: new Date().toISOString(),
+                validTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
             }
 
-            const newEntry = await cds.tx(async (tx) => {
+            const newEntry = await cds.tx( async (tx) => {
                 return await tx.run(INSERT.into(Warehouse).entries(newEntryPayload));
             });
 
@@ -61,7 +69,7 @@ const WarehouseService = async (srv) => {
             }
 
 
-            return newEntryPayload ;
+            return newEntryPayload;
         }
         catch (error) {
             return request.error({
@@ -78,7 +86,7 @@ const WarehouseService = async (srv) => {
 
         console.log("Successfully created the Record");
 
-        return data ;
+        return data;
     });
 
 

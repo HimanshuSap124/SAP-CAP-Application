@@ -4,4 +4,5 @@ service WarehouseService @(path: 'warehouse') {
 
     entity Warehouses as projection on schema.Warehouse;
 
+    function AllEntities() returns String ;
 }

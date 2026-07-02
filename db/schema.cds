@@ -12,6 +12,6 @@ entity Warehouse : managed, temporal, SoftDelete {
     key ID      : UUID;
         name    : String;
         owner   : String;
-        address : localized String;
+        address : String;
         region  : Association to Region ;
 }
