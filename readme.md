@@ -20,187 +20,44 @@ File or Folder | Purpose
 - Start adding content, for example, a [db/schema.cds](db/schema.cds).
 
 
-# Aspect
-An aspect is a reusable collection of fields, annotations, or relationships that can be shared across multiple entities to avoid writing the same code repeatedly.
+# Different ways to declare entity
 
-We use aspects to reuse common fields, annotations, or relationships across multiple entities, reducing code duplication and making the data model easier to maintain.
+## 1. In schema.cds file (Domain Model Entity or Persistent entity)
+- It is a Persistence entity - means data is stored to non-volatile storage (like SSDs, hard drives, or databases) so it survives system reboots and application closures.
+- It by default creates the DB Table.
+- It doesnot directly exposed as OData API.
 
-## 1. uuid
-- UUID (Universally Unique Identifier) is a data type in SAP CAP that stores a globally unique 128-bit identifier. 
-- It is used when you want every record to have a unique ID that is extremely unlikely to duplicate, even across different systems.
+## 2. In service.cds file (Service Entity or Non-Projected Entity)
+- It is a non-projected service entity because it is defined directly inside the service and is not a projection on a database entity.
+- It is non-persisted and handled with custom logic in service.js file.
+- It doesnot create DB Table by default.
+- It is exposed as OData API.
 
-We can use UUID in entity like - 
 ```
-entity Warehouse {
-    key ID : UUID;
-    name : String;
-    owner : String;
-    address : String;
+service EmployeeService {
+
+    entity EmployeeSummary {
+        key ID   : UUID;
+            name : String;
+            count: Integer;
+    };
+
 }
 ```
 
+## Association
 
-## 2. cuid
-- cuid is a built-in aspect provided by SAP CAP that automatically adds a primary key named ID of type UUID to an entity. 
-- It saves you from manually declaring the UUID key, so if we use cuid then entity will itself make a field of ID as UUID and its value will automatically gets added when we add new entry on the entity.
+- An Association is a relationship between two entities that allows one entity to reference another entity.
+- In an Association, the relationship between the entities is weak, meaning records in both entities can exist independently.
+- It means the lifecycle of both entities is independent, and the child entity records remain even if the associated parent record is deleted.
 
-We can use CUID aspect in entity like - 
-```
-using { cuid } from '@sap/cds/common';
-entity Warehouse : cuid{
-   name : String;
-   owner : String;
-   address : String;
-}
-```
-and the actual entity internally will look like - 
-```
-entity Warehouse {
-   key ID : UUID;
-   name : String;
-   owner : String;
-   address : String;
-}
-```
+## Composition
 
-So we don't need to add or manage the ID manually.
+- A Composition is a strong parent-child relationship between two entities where the child belongs to the parent and is part of the parent's lifecycle.
+- In Composition, the relationship between the entities is strong, meaning records in both entities cannot exist independently.
+- It means the lifecycle of both entities is dependent, and the child entity records gets deleted if the associated parent record is deleted.
 
-## 3. managed
 
-- managed is a built-in aspect that automatically adds and maintains audit fields such as who created or modified a record and when those actions occurred.
 
-We can use this aspect in entity like -
-```
-using { cuid, managed } from '@sap/cds/common';
-entity Warehouse : cuid, managed{
-   name : String;
-   owner : String;
-   address : String;
-}
-```
-
-and the actual entity internally will look like - 
-```
-entity Warehouse {
-   key ID : UUID;
-   name : String;
-   owner : String;
-   address : String;
-
-   createdAt  : Timestamp;
-   createdBy  : User;
-   modifiedAt : Timestamp;
-   modifiedBy : User;
-}
-```
-
-## 4. temporal
-- temporal is a built-in aspect that adds validity period fields (validFrom and validTo) to an entity. 
-- It is used for storing historical or time-dependent data.
-
-We can use this aspect in entity like -
-```
-using { cuid, temporal } from '@sap/cds/common';
-entity Warehouse : cuid, temporal{
-    name : String;
-    owner : String;
-    address : String;
-}
-```
-
-and the actual entity internally will look like - 
-```
-entity Warehouse {
-   key ID : UUID;
-   name : String;
-   owner : String;
-   address : String;
-
-   validFrom : Timestamp;
-   validTo   : Timestamp;
-}
-```
-
-## 5. localized
-
-- localized is a keyword that enables multilingual support for a field. 
-- CAP automatically creates the required translation tables and returns values in the users language when available.
-
-We can use this aspect in entity like -
-```
-using { cuid, managed } from '@sap/cds/common';
-entity Warehouse : cuid, managed{
-    name : String;
-    owner : String;
-    address : String ;
-}
-```
-
-## 6. CodeList
-
-- A CodeList in SAP CAP is a predefined aspect used to create lookup (master) data. 
-- It stores a fixed list of values that can be reused across your application instead of typing the same text repeatedly.
-
-For Example, if we are repeatedly using the Region to define country, we can instead define it in a Region entity and rest other entity can use it simply.
-
-Aspect CodeList actually is - 
-```
-aspect CodeList {
-    key code : String;
-    name      : String;
-    descr     : String;
-}
-```
-
-and we can use it on entity as - 
-```
-using { cuid, sap.common.CodeList as CodeList} from '@sap/cds/common';
-
-entity Regions : CodeList {};
-
-entity Warehouse : cuid {
-    name       : String;
-    owner      : String;
-    address    : String;
-
-    region : Association to Regions;
-}
-```
-
-## 7. Custom Aspect
-- A custom aspect is a reusable collection of fields, associations, or annotations created by the developer.
-- It allows the same structure to be shared across multiple entities.
-
-We can create an aspect like - 
-
-```
-aspect SoftDelete {
-    isDeleted : Boolean default false;
-}
-```
-
-and can use it on entity like - 
-```
-using { cuid } from '@sap/cds/common';
-
-aspect SoftDelete {
-    isDeleted : Boolean default false;
-}
-
-entity Warehouse : cuid, SoftDelete {
-    name       : String;
-    owner      : String;
-    address    : String;
-}
-```
-
-and our entity will actually looks like - 
-
-```
-entity Warehouse : cuid, SoftDelete {
-    name       : String;
-    owner      : String;
-    address    : String;
-    isDeleted  : Boolean default false;
-}
-```
+### Deep Insertion
+Deep insertion means creating a parent entity and its composed child entity/entities in a single request.

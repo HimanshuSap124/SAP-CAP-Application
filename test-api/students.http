@@ -1,0 +1,24 @@
+### Create Student
+POST http://localhost:4004/odata/v4/student/Students
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "studentCourses": [
+        {
+            "course": {
+                "ID": "950e8400-e29b-41d4-a716-446655440002"
+            }
+        },
+        {
+            "course": {
+                "ID": "950e8400-e29b-41d4-a716-446655440004"
+            }
+        }
+    ]
+}
+
+
+### Get Student by ID expanded with Courses
+GET http://localhost:4004/odata/v4/student/Students(ID='826d68a1-8cb2-4d5c-b842-dfcec089511f')?$expand=studentCourses

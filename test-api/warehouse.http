@@ -1,18 +1,42 @@
-### GET call to Read all the Warehouses
-GET http://localhost:4004/odata/v4/warehouse/AllEntities
-Accept-Language: en
-
-### GET call to Read all the Warehouses
+### Get Warehouses
 GET http://localhost:4004/odata/v4/warehouse/Warehouses
 
 
-### POST call to Create a new Warehouse
+### Get Warehouse by ID
+GET http://localhost:4004/odata/v4/warehouse/Warehouses(2ff1b8c2-cd8d-41e3-b67e-84ddb13264a4)
+
+
+### Create Warehouse
 POST http://localhost:4004/odata/v4/warehouse/Warehouses
 Content-Type: application/json
 
 {
     "name" : "Elite Storage",
     "owner" : "Elite Transport Co",
-    "address" : "77 Business Zone Panchkula",
-    "region_ID" : "550e8400-e29b-41d4-a716-446655440005"
+    "address" : "77 Business Zone Panchkula"
 }
+
+
+### Update Warehouse complete details
+PUT http://localhost:4004/odata/v4/warehouse/Warehouses(2ff1b8c2-cd8d-41e3-b67e-84ddb13264a4)
+Content-Type: application/json
+
+{
+    "name" : "Elite Storage New",
+    "owner" : "Elite Transport Co Ltd",
+    "address" : "601 Business Zone Panchkula"
+}
+
+
+### Patch Update Warehouse details
+
+PATCH http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440010)
+Content-Type: application/json
+
+{
+    "address": "605 Business Zone Panchkula"
+}
+
+
+### Delete Warehouse record by ID
+DELETE http://localhost:4004/odata/v4/warehouse/Warehouses(550e8400-e29b-41d4-a716-446655440010)

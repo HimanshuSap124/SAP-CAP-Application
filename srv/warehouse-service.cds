@@ -1,8 +1,16 @@
-using {cap.application.db.schema} from '../db/schema';
+using {cap.application.db.schema} from '../db/schema' ;
 
-service WarehouseService @(path: 'warehouse') {
 
+
+service WarehouseService @(path : 'warehouse') {
+    
     entity Warehouses as projection on schema.Warehouse;
 
-    function AllEntities() returns String ;
+    entity Products {
+        key ID   : UUID;
+            name : String;
+            count: Integer;
+    }
+
+
 }
