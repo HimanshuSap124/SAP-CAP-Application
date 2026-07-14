@@ -47,7 +47,8 @@ const EmployeeService = async (srv) => {
 
         }
         catch (error) {
-
+            console.error('Error creating employee entry:', error);
+            return request.reject(500, 'Internal server error');
         }
     });
 
