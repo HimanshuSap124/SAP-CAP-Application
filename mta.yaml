@@ -28,8 +28,6 @@ modules:
       - name: cap-application-db
       # Declare Destination Service Requirement below
       - name: cap-application-destination-service
-      # Declare SBPA Service Requirement below
-      - name: cap-application-sbpa-service
 
 
 
@@ -60,55 +58,6 @@ modules:
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
-
-
-
-  - name: cap-application-cap-destinations-creator-module # Module to create Destination using Destination Service
-    type: com.sap.application.content
-    requires:
-      - name: cap-application-auth
-        parameters:
-          service-key:
-            name: cap-application-cap-auth-key
-      - name: srv-api
-      - name: cap-application-destination-service
-        parameters:
-          content-target: true
-      - name: cap-application-sbpa-service  # <-- Add SBPA resource details as requirement here
-        parameters:
-          service-key:
-            name: cap-application-sbpa-service-key
-    parameters:
-      content:
-        subaccount:
-          destinations:
-            # Destinations based on the CAP service and XSUAA service are created here.    
-            # Destination - 1 
-            - Name: cap_application_Testing_Destination #The destination to the CAP service. It is required by your UIs running in SAP Launchpad service to access your service.
-              Authentication: OAuth2UserTokenExchange
-              TokenServiceInstanceName: cap-application-auth
-              TokenServiceKeyName: cap-application-auth-key
-              URL: '~{srv-api/srv-url}'
-              sap.cloud.service: cap-application.service
-              
-            # Destination - 2
-            - Name: cap_application_Testing_Destination-auth #The destination to your XSUAA service instance. The SAP Launchpad service needs it to convert OAuth tokens for use with your CAP service.
-              Authentication: OAuth2UserTokenExchange
-              ServiceInstanceName: cap-application-auth
-              ServiceKeyName: cap-application-auth-key
-              sap.cloud.service: cap-application.service
-
-            # Destination - 3 - SBPA Destination
-            - Name: cap_application_Destination-sbpa
-              Authentication: OAuth2UserTokenExchange
-              ServiceInstanceName: cap-application-sbpa-service-instance  # <-- SBPA Service Instance Name
-              ServiceKeyName: cap-application-sbpa-service-key            # <-- SBPA Service Service Key
-              sap.cloud.service: cap-application.service
-
-          existing_destinations_policy: update
-    build-parameters:
-      no-source: true
-
 
 
 
@@ -145,22 +94,3 @@ resources:
       service-name: cap-application-destination-instance # <-- Service instance name
       config:
         HTML5Runtime_enabled: true
-        # Destination 3 - Custom Destinations
-        init_data:
-          subaccount:
-            destinations:
-              - Name: cap_application_Testing_Destination_URL
-                Type: HTTP
-                ProxyType: Internet
-                Authentication: NoAuthentication
-                URL: https://myurl.com
-            existing_destinations_policy: update
-        version: 1.0.0
-
-  # Define SBPA Service Resource detials
-  - name: cap-application-sbpa-service
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: process-automation-service
-      service-plan: standard
-      service-name: cap-application-sbpa-service-instance
