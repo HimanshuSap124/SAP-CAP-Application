@@ -26,8 +26,6 @@ modules:
     requires:
       - name: cap-application-auth
       - name: cap-application-db
-      # Declare Destination Service Requirement below
-      - name: cap-application-destination-service
 
 
 
@@ -84,13 +82,3 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
-
-  # Define Destination Service Resource detials
-  - name: cap-application-destination-service
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: destination
-      service-plan: lite
-      service-name: cap-application-destination-instance # <-- Service instance name
-      config:
-        HTML5Runtime_enabled: true

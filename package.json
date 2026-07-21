@@ -6,7 +6,8 @@
     "@sap-cloud-sdk/connectivity": "^4.7.0",
     "@sap-cloud-sdk/http-client": "^4.7.0",
     "@sap/cds": "^9",
-    "@sap/xssec": "^4"
+    "@sap/xssec": "^4",
+    "axios": "^1.18.1"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4",
