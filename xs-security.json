@@ -1,5 +1,21 @@
 {
-  "scopes": [],
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.JobScheduler",
+      "description": "Job Scheduler Scope",
+      "grant-as-authority-to-apps": [
+        "$XSSERVICENAME(cap-application-job-scheduler-instance)"
+      ]
+    }
+  ],
   "attributes": [],
-  "role-templates": []
+  "role-templates": [
+    {
+      "name": "JobSchedulerRole",
+      "description": "Role collection for Job Scheduler calls",
+      "scope-references": [
+        "$XSAPPNAME.JobScheduler"
+      ]
+    }
+  ]
 }

@@ -26,6 +26,8 @@ modules:
     requires:
       - name: cap-application-auth
       - name: cap-application-db
+      # Declare Job Scheduler Requirement below
+      - name: cap-application-job-scheduler
 
 
 
@@ -82,3 +84,13 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
+
+  # Declare Job Scheduler Resources below
+  - name: cap-application-job-scheduler
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: jobscheduler
+      service-plan: standard
+      service-name: cap-application-job-scheduler-instance  # <-- Job Schedular Instance name
+      config:
+        enable-job-scheduler: true
