@@ -57,9 +57,9 @@ const WarehouseService = async (srv) => {
                 validTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
             }
 
-            const newEntry = await cds.tx( async (tx) => {
-                return await tx.run(INSERT.into(Warehouse).entries(newEntryPayload));
-            });
+            const transaction = cds.tx(request);
+
+            const newEntry = await transaction.run(INSERT.into(Warehouse).entries(newEntryPayload));
 
             if (!newEntry) {
                 return request.error({
