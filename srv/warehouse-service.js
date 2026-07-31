@@ -45,9 +45,9 @@ const WarehouseService = async (srv) => {
                 address: address
             }
 
-            const newEntry = await cds.tx(async (tx) => {
-                return await tx.run(INSERT.into(Warehouse).entries(newEntryPayload));
-            });
+            const transaction = cds.tx(request);
+
+            const newEntry = await transaction.run(INSERT.into(Warehouse).entries(newEntryPayload));
 
             if (!newEntry) {
                 return request.error({
@@ -82,9 +82,10 @@ const WarehouseService = async (srv) => {
     //  ######################### Function ##########################
     srv.on('getWarehouseCount', async (request) => {
         try {
-            const warehouseRecords = await cds.tx(async (tx) => {
-                return await tx.run(SELECT.from(Warehouse));
-            });
+
+            const transaction = cds.tx(request);
+
+            const warehouseRecords = await transaction.run(SELECT.from(Warehouse));
 
             if (!warehouseRecords) {
                 throw new Error(`No Records Found`);
@@ -112,10 +113,9 @@ const WarehouseService = async (srv) => {
                 throw new Error(`Invalid Request, please check payload`);
             }
 
+            const transaction = cds.tx(request);
 
-            const updateRecord = await cds.tx(async (tx) => {
-                return await tx.run(UPDATE(Warehouse).set({owner : newOwner}).where({ID : warehouseId}));
-            });
+            const updateRecord = await transaction.run(UPDATE(Warehouse).set({owner : newOwner}).where({ID : warehouseId}));
 
             if(!updateRecord){
                 throw new Error(`Failed to Update Warehouse Owner`);
